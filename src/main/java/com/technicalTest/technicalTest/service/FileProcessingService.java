@@ -1,6 +1,7 @@
 package com.technicalTest.technicalTest.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.technicalTest.technicalTest.repository.CdrLogRepository;
@@ -17,7 +18,8 @@ import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DecimalStyle;
+
+import org.springframework.core.env.Environment;
 
 @Service
 public class FileProcessingService {
@@ -25,13 +27,17 @@ public class FileProcessingService {
     @Autowired
     private CdrLogRepository cdrLogRepository;
 
+    @Value("${file.upload-dir}")
+    String folderPath;
+
     @Autowired
     private CallDetailRecordRepository callDetailRecordRepository;
 
     public void processFiles() {
 
         System.out.println("START PROCESS");
-        String folderPath = "D:\\Users\\roberto.calero\\Documents\\NicCoders\\test";
+
+
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
@@ -140,7 +146,10 @@ public class FileProcessingService {
             cdr.setTstamp(tstamp);
 
             cdr.setLocalDialogId(fields[28] == null || fields[28].isEmpty() ? null : Long.parseLong(fields[28]));
-            cdr.setId(fields[29]);
+            cdr.setRemoteDialogId(fields[29] == null || fields[29].isEmpty() ? null : Long.parseLong(fields[29]));
+            cdr.setDialogDuration(fields[30] == null || fields[30].isEmpty() ? null : Long.parseLong(fields[30]));
+            cdr.setUssdString(fields[31]);
+            cdr.setId(fields[32]);
 
             // Save the instance in the database
             callDetailRecordRepository.save(cdr);
